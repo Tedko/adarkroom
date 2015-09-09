@@ -39,7 +39,7 @@ var Space = {
 		
 		// Create the hull display
 		var h = $('<div>').attr('id', 'hullRemaining').appendTo(this.panel);
-		$('<div>').addClass('row_key').text('hull: ').appendTo(h);
+		$('<div>').addClass('row_key').text(_('hull: ')).appendTo(h);
 		$('<div>').addClass('row_val').appendTo(h);
 		
 		//subscribe to stateUpdates
@@ -73,17 +73,17 @@ var Space = {
 		if(Engine.activeModule == this) {
 			var t;
 			if(Space.altitude < 10) {
-				t = "Troposphere";
+				t = _("Troposphere");
 			} else if(Space.altitude < 20) {
-				t = "Stratosphere";
+				t = _("Stratosphere");
 			} else if(Space.altitude < 30) {
-				t = "Mesosphere";
+				t = _("Mesosphere");
 			} else if(Space.altitude < 45) {
-				t = "Thermosphere";
+				t = _("Thermosphere");
 			} else if(Space.altitude < 60){
-				t = "Exosphere";
+				t = _("Exosphere");
 			} else {
-				t = "Space";
+				t = _("Space");
 			}
 			document.title = t;
 		}
@@ -136,7 +136,7 @@ var Space = {
 						t.remove();
 						Space.hull--;
 						Space.updateHull();
-						if(Space.hull == 0) {
+						if(Space.hull === 0) {
 							Space.crash();
 						}
 					}
@@ -166,7 +166,7 @@ var Space = {
 			}
 			
 			if(!Space.done) {
-				setTimeout(Space.createAsteroid, 1000 - (Space.altitude * 10));
+				Engine.setTimeout(Space.createAsteroid, 1000 - (Space.altitude * 10));
 			}
 		}
 	},
@@ -190,7 +190,7 @@ var Space = {
 			dx += Space.getSpeed();
 		}
 		
-		if(dx != 0 && dy != 0) {
+		if(dx !== 0 && dy !== 0) {
 			dx = dx / Math.sqrt(2);
 			dy = dy / Math.sqrt(2);
 		}
@@ -226,13 +226,15 @@ var Space = {
 	},
 	
 	startAscent: function() {
+		var body_color;
+		var to_color;
 		if (Engine.isLightsOff()) {
-			var body_color = '#272823';
-			var to_color = '#EEEEEE';
+			body_color = '#272823';
+			to_color = '#EEEEEE';
 		}
 		else {
-			var body_color = '#FFFFFF';
-			var to_color = '#000000';
+			body_color = '#FFFFFF';
+			to_color = '#000000';
 		}
 
 		$('body').addClass('noMask').css({backgroundColor: body_color}).animate({
@@ -251,7 +253,7 @@ var Space = {
 		Space.drawStars();
 		Space._timer = setInterval(function() {
 			Space.altitude += 1;
-			if(Space.altitude % 10 == 0) {
+			if(Space.altitude % 10 === 0) {
 				Space.setTitle();
 			}
 			if(Space.altitude > 60) {
@@ -259,11 +261,11 @@ var Space = {
 			}
 		}, 1000);
 		
-		Space._panelTimeout = setTimeout(function() {
+		Space._panelTimeout = Engine.setTimeout(function() {
 			if (Engine.isLightsOff())
-				$('#spacePanel, .menu').animate({color: '#272823'}, 500, 'linear');
+				$('#spacePanel, .menu, select.menuBtn').animate({color: '#272823'}, 500, 'linear');
 			else
-				$('#spacePanel, .menu').animate({color: 'white'}, 500, 'linear');
+				$('#spacePanel, .menu, select.menuBtn').animate({color: 'white'}, 500, 'linear');
 		}, Space.FTB_SPEED / 2);
 		
 		Space.createAsteroid();
@@ -313,7 +315,7 @@ var Space = {
 			left: left
 		}).appendTo(el2);
 		if(num < Space.NUM_STARS) {
-			setTimeout(function() { Space.drawStarAsync(el, el2, num + 1); }, 100);
+			Engine.setTimeout(function() { Space.drawStarAsync(el, el2, num + 1); }, 100);
 		}
 	},
 	
@@ -324,10 +326,11 @@ var Space = {
 		clearInterval(Space._timer);
 		clearInterval(Space._shipTimer);
 		clearTimeout(Space._panelTimeout);
+		var body_color;
 		if (Engine.isLightsOff())
-			var body_color = '#272823';
+			body_color = '#272823';
 		else
-			var body_color = '#FFFFFF';
+			body_color = '#FFFFFF';
 		// Craaaaash!
 		$('body').removeClass('noMask').stop().animate({
 			backgroundColor: body_color
@@ -349,7 +352,7 @@ var Space = {
 				$('#spacePanel').attr('style', '');			
 			}
 		});
-		$('.menu').animate({color: '#666'}, 300, 'linear');
+		$('.menu, select.menuBtn').animate({color: '#666'}, 300, 'linear');
 		$('#outerSlider').animate({top: '0px'}, 300, 'linear');
 		Engine.activeModule = Ship;
 		Ship.onArrival();
@@ -382,7 +385,7 @@ var Space = {
 			top: '350px',
 			left: '240px'
 		}, 3000, 'linear', function() {
-			setTimeout(function() {
+			Engine.setTimeout(function() {
 				Space.ship.animate({
 					top: '-100px'
 				}, 200, 'linear', function() {
@@ -390,12 +393,13 @@ var Space = {
 					$('#outerSlider').css({'left': '0px', 'top': '0px'});
 					$('#locationSlider, #worldPanel, #spacePanel, #notifications').remove();
 					$('#header').empty();
-					setTimeout(function() {
+					Engine.setTimeout(function() {
 						$('body').stop();
+						var container_color;
 						if (Engine.isLightsOff())
-							var container_color = '#EEE';
+							container_color = '#EEE';
 						else
-							var container_color = '#000';
+							container_color = '#000';
 						$('#starsContainer').animate({
 							opacity: 0,
 							'background-color': container_color
@@ -409,39 +413,38 @@ var Space = {
 							},
 							complete: function() {
 								Engine.GAME_OVER = true;
-
-				                Score.save();
-				                Prestige.save();
-				                
-				                $('<center>')
-				                	.addClass('centerCont')
-			                		.appendTo('body');
-				                $('<span>')
-				                	.addClass('endGame')
-			                		.text('score for this game: ' + Score.calculateScore())
-			                		.appendTo('.centerCont')
-			                		.animate({opacity:1},1500);
-				                $('<br />')
-				                	.appendTo('.centerCont');
-				                $('<span>')
-				                	.addClass('endGame')
-			                		.text('total score: ' + Prestige.get().score)
-			                		.appendTo('.centerCont')
-			                		.animate({opacity:1},1500);
-				                $('<br />')
-				                	.appendTo('.centerCont');
-				                $('<br />')
-				                	.appendTo('.centerCont');
-				                $('#starsContainer').remove();
-					    		$('#content, #notifications').remove();
-					    		$('<span>')
-				                	.addClass('endGame endGameRestart')
-				                	.text('restart.')
-				                	.click(Engine.confirmDelete)
-				                	.appendTo('.centerCont')
-				                	.animate({opacity:1},1500);
-					    		Engine.options = {};
-				                Engine.deleteSave(true);
+								Score.save();
+								Prestige.save();
+						
+								$('<center>')
+									.addClass('centerCont')
+									.appendTo('body');
+								$('<span>')
+									.addClass('endGame')
+									.text(_('score for this game: {0}', Score.calculateScore()))
+									.appendTo('.centerCont')
+									.animate({opacity:1},1500);
+								$('<br />')
+									.appendTo('.centerCont');
+								$('<span>')
+									.addClass('endGame')
+									.text(_('total score: {0}', Prestige.get().score))
+									.appendTo('.centerCont')
+									.animate({opacity:1},1500);
+								$('<br />')
+									.appendTo('.centerCont');
+								$('<br />')
+									.appendTo('.centerCont');
+								$('#starsContainer').remove();
+								$('#content, #notifications').remove();
+								$('<span>')
+									.addClass('endGame endGameRestart')
+									.text(_('restart.'))
+									.click(Engine.confirmDelete)
+									.appendTo('.centerCont')
+									.animate({opacity:1},1500);
+								Engine.options = {};
+								Engine.deleteSave(true);
 							}
 						});
 					}, 2000);
